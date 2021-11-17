@@ -28,7 +28,7 @@ export class SVGPathDataParser extends TransformableSVG {
     this.parse(" ", commands);
     // Adding residual command
     if (0 !== this.curArgs.length || !this.canParseCommandOrComma) {
-      throw new SyntaxError("Unterminated command at the path end.");
+      commands.error = "Unterminated command at the path end.";
     }
     return commands;
   }
@@ -84,20 +84,21 @@ export class SVGPathDataParser extends TransformableSVG {
       if (this.curNumber && -1 !== this.curCommandType) {
         const val = Number(this.curNumber);
         if (isNaN(val)) {
-          throw new SyntaxError(`Invalid number ending at ${i}`);
+          commands.error = `Invalid number ending at ${i}`;
+          return;
         }
         if (this.curCommandType === SVGPathData.ARC) {
           if (0 === this.curArgs.length || 1 === this.curArgs.length) {
             if (0 > val) {
-              throw new SyntaxError(
-                `Expected positive number, got "${val}" at index "${i}"`,
-              );
+              commands.error =
+                `Expected positive number, got "${val}" at index "${i}"`;
+              return;
             }
           } else if (3 === this.curArgs.length || 4 === this.curArgs.length) {
             if ("0" !== this.curNumber && "1" !== this.curNumber) {
-              throw new SyntaxError(
-                `Expected a flag, got "${this.curNumber}" at index "${i}"`,
-              );
+              commands.error =
+                `Expected a flag, got "${this.curNumber}" at index "${i}"`;
+              return;
             }
           }
         }
@@ -204,12 +205,13 @@ export class SVGPathDataParser extends TransformableSVG {
 
       // Adding residual command
       if (0 !== this.curArgs.length) {
-        throw new SyntaxError(`Unterminated command at index ${i}.`);
+        commands.error = `Unterminated command at index ${i}.`;
+        return;
       }
       if (!this.canParseCommandOrComma) {
-        throw new SyntaxError(
-          `Unexpected character "${c}" at index ${i}. Command cannot follow comma`,
-        );
+        commands.error =
+          `Unexpected character "${c}" at index ${i}. Command cannot follow comma`;
+        return;
       }
       this.canParseCommandOrComma = false;
       // Detecting the next command
