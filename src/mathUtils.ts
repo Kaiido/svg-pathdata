@@ -164,8 +164,7 @@ export function a2c(arc: CommandA, x0: number, y0: number): CommandC[] {
 
   const phiMin = Math.min(arc.phi1!, arc.phi2!), phiMax = Math.max(arc.phi1!, arc.phi2!), deltaPhi = phiMax - phiMin;
   const partCount = Math.ceil(deltaPhi / 90 );
-
-  const result: CommandC[] = new Array(partCount);
+  const result: CommandC[] = new Array(partCount || 0);
   let prevX = x0, prevY = y0;
   for (let i = 0; i < partCount; i++) {
     const phiStart = lerp(arc.phi1!, arc.phi2!, i / partCount);
